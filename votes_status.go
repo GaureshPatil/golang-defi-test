@@ -86,6 +86,8 @@ func PrintEpochVoteStatus(cProps *ConnectionProps) error {
 			candidates = append(candidates, v.Candidate)
 		}
 	}
+	// Merge note: main sorted tallies ascending (<) while dev sorted them descending (>).
+	// Resolved by keeping dev's descending order so the leading candidate is listed first.
 	sort.Slice(candidates, func(i, j int) bool { return tally[candidates[i]] > tally[candidates[j]] })
 
 	log.Printf("  Candidate tallies:")
@@ -163,6 +165,9 @@ func gatherEpochVotes(cProps *ConnectionProps, startBlock *big.Int, head uint64)
 			if !ok {
 				continue
 			}
+			// Merge note: dev removed this seen/order bookkeeping, but the result below is built
+			// from order. Dropping it would always return no votes and leave seen unused, so main's
+			// version is kept.
 			if !seen[voter] {
 				seen[voter] = true
 				order = append(order, voter)
